@@ -9,7 +9,9 @@ PROOT_BIN="$BASE_DIR/proot-x86_64"
 MAX_RETRIES=50
 TIMEOUT=10
 
-PROOT_URL="https://raw.githubusercontent.com/padarham9-ui/Rootfree/main/proot-v5.2.0-alpha-x86_64-static"
+# Official PRoot latest x86_64 binary
+PROOT_URL="https://proot.gitlab.io/proot/bin/proot"
+
 UBUNTU_URL="https://cdimage.ubuntu.com/ubuntu-base/releases/resolute/release/ubuntu-base-26.04-base-amd64.tar.gz"
 
 CYAN='\033[0;36m'
@@ -18,7 +20,10 @@ RESET='\033[0m'
 
 ARCH="$(uname -m)"
 
-# فقط x86_64
+# ------------------------------------------------------------------------------
+# Architecture check
+# ------------------------------------------------------------------------------
+
 if [ "$ARCH" != "x86_64" ]; then
     printf "${RED}Unsupported CPU architecture: %s${RESET}\n" "$ARCH"
     exit 1
@@ -29,29 +34,58 @@ clear
 echo "################################################################################"
 echo "#"
 echo "#                         Ubuntu 26.04 LTS"
-echo "#                         PRoot x86_64"
+echo "#                         Official PRoot x86_64"
 echo "#"
 echo "################################################################################"
 echo
 
 # ------------------------------------------------------------------------------
-# Download PRoot
+# Download official latest PRoot
 # ------------------------------------------------------------------------------
 
-if [ ! -s "$PROOT_BIN" ]; then
-    echo "[+] Downloading PRoot v5.2.0-alpha x86_64..."
+echo "[+] Checking official PRoot..."
+
+DOWNLOAD_PROOT=1
+
+if [ -s "$PROOT_BIN" ]; then
+    if "$PROOT_BIN" --version >/dev/null 2>&1; then
+        DOWNLOAD_PROOT=0
+        echo "[+] Existing official PRoot binary is valid."
+    else
+        echo "[!] Existing PRoot binary is invalid. Re-downloading..."
+        rm -f "$PROOT_BIN"
+    fi
+fi
+
+if [ "$DOWNLOAD_PROOT" -eq 1 ]; then
+    echo "[+] Downloading latest official PRoot x86_64..."
 
     rm -f "$PROOT_BIN"
 
-    wget \
-        --tries="$MAX_RETRIES" \
-        --timeout="$TIMEOUT" \
-        --no-hsts \
-        -O "$PROOT_BIN" \
-        "$PROOT_URL"
+    if command -v curl >/dev/null 2>&1; then
+        curl \
+            -fL \
+            --retry "$MAX_RETRIES" \
+            --retry-delay 1 \
+            --connect-timeout "$TIMEOUT" \
+            --max-time 300 \
+            -o "$PROOT_BIN" \
+            "$PROOT_URL"
+    elif command -v wget >/dev/null 2>&1; then
+        wget \
+            --tries="$MAX_RETRIES" \
+            --timeout="$TIMEOUT" \
+            --no-hsts \
+            -O "$PROOT_BIN" \
+            "$PROOT_URL"
+    else
+        printf "${RED}[-] Neither curl nor wget is installed.${RESET}\n"
+        exit 1
+    fi
 
     if [ $? -ne 0 ] || [ ! -s "$PROOT_BIN" ]; then
-        printf "${RED}[-] Failed to download PRoot.${RESET}\n"
+        printf "${RED}[-] Failed to download official PRoot.${RESET}\n"
+        rm -f "$PROOT_BIN"
         exit 1
     fi
 
@@ -92,12 +126,26 @@ if [ ! -x "$ROOTFS_DIR/bin/bash" ]; then
 
     rm -f /tmp/ubuntu-base-26.04.tar.gz
 
-    wget \
-        --tries="$MAX_RETRIES" \
-        --timeout="$TIMEOUT" \
-        --no-hsts \
-        -O /tmp/ubuntu-base-26.04.tar.gz \
-        "$UBUNTU_URL"
+    if command -v curl >/dev/null 2>&1; then
+        curl \
+            -fL \
+            --retry "$MAX_RETRIES" \
+            --retry-delay 1 \
+            --connect-timeout "$TIMEOUT" \
+            --max-time 900 \
+            -o /tmp/ubuntu-base-26.04.tar.gz \
+            "$UBUNTU_URL"
+    elif command -v wget >/dev/null 2>&1; then
+        wget \
+            --tries="$MAX_RETRIES" \
+            --timeout="$TIMEOUT" \
+            --no-hsts \
+            -O /tmp/ubuntu-base-26.04.tar.gz \
+            "$UBUNTU_URL"
+    else
+        printf "${RED}[-] Neither curl nor wget is installed.${RESET}\n"
+        exit 1
+    fi
 
     if [ $? -ne 0 ] || [ ! -s /tmp/ubuntu-base-26.04.tar.gz ]; then
         printf "${RED}[-] Failed to download Ubuntu 26.04 LTS.${RESET}\n"
@@ -106,10 +154,13 @@ if [ ! -x "$ROOTFS_DIR/bin/bash" ]; then
 
     echo "[+] Extracting Ubuntu..."
 
-    tar -xzf /tmp/ubuntu-base-26.04.tar.gz -C "$ROOTFS_DIR"
+    if ! tar -xzf /tmp/ubuntu-base-26.04.tar.gz -C "$ROOTFS_DIR"; then
+        printf "${RED}[-] Failed to extract Ubuntu rootfs.${RESET}\n"
+        exit 1
+    fi
 
-    if [ $? -ne 0 ] || [ ! -x "$ROOTFS_DIR/bin/bash" ]; then
-        printf "${RED}[-] Failed to extract a valid Ubuntu rootfs.${RESET}\n"
+    if [ ! -x "$ROOTFS_DIR/bin/bash" ]; then
+        printf "${RED}[-] Extracted rootfs is invalid.${RESET}\n"
         exit 1
     fi
 
@@ -151,7 +202,7 @@ printf "           ${CYAN}-----> Mission Completed! <----${RESET}\n"
 echo
 echo "[+] Ubuntu : 26.04 LTS"
 echo "[+] Arch   : x86_64"
-echo "[+] PRoot  : $("$PROOT_BIN" --version 2>/dev/null)"
+echo "[+] PRoot  : $("${PROOT_BIN}" --version 2>/dev/null)"
 echo
 echo "[+] Starting Ubuntu..."
 echo
