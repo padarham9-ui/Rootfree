@@ -4,6 +4,8 @@
 # کد ها برای اجرا
 ```text
 git clone https://github.com/padarham9-ui/Rootfree.git
-cd Rootfree```
+cd Rootfree
+```
 ```text
-bash install.sh```
+bash install.sh
+```
