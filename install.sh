@@ -5,7 +5,7 @@ ROOTFS_DIR="$BASE_DIR/ubuntu"
 PROOT_BIN="$BASE_DIR/proot-x86_64"
 
 PROOT_URL="https://github.com/padarham9-ui/Rootfree/raw/refs/heads/main/proot-v5.2.0-alpha-x86_64-static"
-UBUNTU_URL="https://cdimage.ubuntu.com/ubuntu-base/releases/resolute/release/ubuntu-base-26.04-base-amd64.tar.gz"
+UBUNTU_URL="https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/ubuntu-base-24.04.4-base-amd64.tar.gz?utm_source=chatgpt.com"
 
 MAX_RETRIES=50
 TIMEOUT=15
