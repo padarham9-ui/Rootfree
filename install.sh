@@ -4,7 +4,7 @@ BASE_DIR="$(pwd)"
 ROOTFS_DIR="$BASE_DIR/ubuntu"
 PROOT_BIN="$BASE_DIR/proot-x86_64"
 
-PROOT_URL="https://proot.gitlab.io/proot/bin/proot"
+PROOT_URL="https://github.com/padarham9-ui/Rootfree/raw/refs/heads/main/proot-v5.2.0-alpha-x86_64-static"
 UBUNTU_URL="https://cdimage.ubuntu.com/ubuntu-base/releases/resolute/release/ubuntu-base-26.04-base-amd64.tar.gz"
 
 MAX_RETRIES=50
