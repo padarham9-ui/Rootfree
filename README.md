@@ -5,7 +5,5 @@
 ```text
 git clone https://github.com/padarham9-ui/Rootfree.git
 cd Rootfree
-```
-```text
 bash install.sh
 ```
