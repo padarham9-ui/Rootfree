@@ -9,7 +9,7 @@ PROOT_BIN="$BASE_DIR/proot-x86_64"
 MAX_RETRIES=50  
 TIMEOUT=10  
   
-PROOT_URL="https://raw.githubusercontent.com/padarham9-ui/Rootfree/main/proot-v5.2.0-alpha-x86_64-static"  
+PROOT_URL="https://github.com/padarham9-ui/Rootfree/raw/refs/heads/main/proot-v5.2.0-alpha-x86_64-static"  
 UBUNTU_URL="https://cdimage.ubuntu.com/ubuntu-base/releases/resolute/release/ubuntu-base-26.04-base-amd64.tar.gz"  
   
 CYAN='\033[0;36m'  
